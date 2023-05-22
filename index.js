@@ -21,5 +21,23 @@ const candidates = {
 
 function randomRGB() {
     const r = () => Math.random() * 256 >> 0;
-    return `rgb(${r()}), ${r()}),, ${r()}))`;
+    return `rgb(${r()}, ${r()}, ${r()})`;
 }
+
+// socket.io server inside express
+const io = require('socket.io')(server)
+io.on('connection',(socket) => {
+    console.log('Nuevo cliente conectado')
+    // Mandar datos
+    io.emit('update', candidates)
+
+    // Cuando alguien selecciona una opcion
+    socket.on('vote',(index) => {
+        if(candidates[index]){
+            candidates[index].votes += 1
+        }
+
+        // Mostrar si alguien voto
+        io.emit('update',candidates)
+    })
+})
