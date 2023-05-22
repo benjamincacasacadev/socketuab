@@ -8,20 +8,71 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js" integrity="sha512-xbQU0+iHqhVt7VIXi6vBJKPh3IQBF5B84sSHdjKiSccyX/1ZI7Vnkt2/8y8uruj63/DVmCxfUNohPNruthTEQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.min.js" integrity="sha512-mlz/Fs1VtBou2TrUkGzX4VoGvybkD9nkeXWJm3rle0DPHssYYx4j+8kIS15T78ttGfmOjH0lLaBXGcShaVkdkg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/litera/bootstrap.min.css" integrity="sha384-enpDwFISL6M3ZGZ50Tjo8m65q06uLVnyvkFO3rsoW0UC15ATBFz3QEhr3hmxpYsn" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/united/bootstrap.min.css" integrity="sha384-JW3PJkbqVWtBhuV/gsuyVVt3m/ecRJjwXC3gCXlTzZZV+zIEEl6AnryAriT7GWYm" crossorigin="anonymous">
+
 </head>
 <body>
-    <h1>Ventas de hoy</h1>
-    <canvas id="voteChart" style="height:50vh; width:100vw"></canvas>
 
-    <button onclick="vote(0)">Javascript</button>
-    <button onclick="vote(1)">C</button>
-    <button onclick="vote(2)">PHP</button>
-    <button onclick="vote(3)">Python</button>
-    <button onclick="vote(4)">Go</button>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+        <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item cursor-pointer">
+                        <a class="nav-link active" onclick="reset()">Reporte de ventas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mt-5 ms-1 me-1">
+        <center>
+            <h1>Ventas de hoy</h1>
+        </center>
+        <div class="row">
+            <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                <canvas id="voteChart" style="height:80vh; width:100vw"></canvas>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+
+                <div class="jumbotron mt-5">
+                    <h3 class="heading text-center">Registrar ventas</h3>
+                    <div class="row">
+                        <div class="col-lg-12 mb-2">
+                            <label class="form-label mt-4">Articulo</label>
+                            <select id="articuloSel" class="form-select form-control">
+                                <option value="0">UPS</option>
+                                <option value="1">Aires de precisión</option>
+                                <option value="2">Baterias de litio</option>
+                                <option value="3">Rectificadores</option>
+                                <option value="4">Reguladores de potencia</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-12 mb-5">
+                            <label class="form-label mt-4">Cantidad</label>
+                            <input type="text" class="form-control" id="inputCantidad" placeholder="Ingrese la cantidad" value="1">
+                        </div>
+
+                        <div class="col-lg-12">
+                            <button class="btn btn-primary btn-block btn-lg" onclick="vote()">Registrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 <script>
-    const ctx = document.getElementById('voteChart').getContext('2d')
+    const ctx = document.getElementById('voteChart')
 
     const chart = new Chart(ctx, {
         type:'bar',
@@ -29,13 +80,17 @@
             labels: ['Ventas de hoy']
         },
         options: {
-
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
     })
 
     const socket = io("localhost:3000")
     socket.on('update',(candidates) => {
-        console.log(candidates)
+        // console.log(candidates)
         candidates = Object.entries(candidates);
 
         for(const [key,candidate] of candidates){
@@ -54,8 +109,31 @@
         chart.update()
     })
 
-    function vote(index){
-        socket.emit('vote',index)
+    function vote(){
+        const articulo = document.getElementById('articuloSel');
+        const artValue = parseInt(articulo.value);
+
+        const cantidad = document.getElementById('inputCantidad');
+        const cantValue = parseInt(cantidad.value);
+        socket.emit('vote',artValue, cantValue)
     }
+
+    function reset(){
+        socket.emit('reset',0)
+    }
+
+
+    // function vote(index, valor){
+
+    //     const articulo = document.getElementById('articuloSel');
+    //     const artValue = parseInt(articulo.value);
+
+    //     const cantidad = document.getElementById('inputCantidad');
+    //     const cantValue = parseInt(cantidad.value);
+    //     console.log(articulo.value);
+    //     socket.emit('vote',artValue, cantValue)
+
+    //     // socket.emit('vote',index, valor)
+    // }
 </script>
 </html>

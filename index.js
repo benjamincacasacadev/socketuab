@@ -12,11 +12,11 @@ const server = app.listen(port, () => {
 
 // Inicializar votos
 const candidates = {
-    "0":{votes: 0, label: 'Javascript', color: randomRGB() },
-    "1":{votes: 0, label: 'C#', color: randomRGB() },
-    "2":{votes: 0, label: 'PHP', color: randomRGB() },
-    "3":{votes: 0, label: 'Python', color: randomRGB() },
-    "4":{votes: 0, label: 'Go', color: randomRGB() },
+    "0":{votes: 0, label: 'UPS', color: randomRGB() },
+    "1":{votes: 0, label: 'Aires de precisión', color: randomRGB() },
+    "2":{votes: 0, label: 'Baterias de litio', color: randomRGB() },
+    "3":{votes: 0, label: 'Rectificadores', color: randomRGB() },
+    "4":{votes: 0, label: 'Reguladores de potencia', color: randomRGB() },
 }
 
 function randomRGB() {
@@ -32,11 +32,21 @@ io.on('connection',(socket) => {
     io.emit('update', candidates)
 
     // Cuando alguien selecciona una opcion
-    socket.on('vote',(index) => {
+    socket.on('vote',(index, valor) => {
         if(candidates[index]){
-            candidates[index].votes += 1
+            candidates[index].votes += valor
         }
 
+        // Mostrar si alguien voto
+        io.emit('update',candidates)
+    });
+
+    socket.on('reset',(index) => {
+        candidates[0].votes = 0
+        candidates[1].votes = 0
+        candidates[2].votes = 0
+        candidates[3].votes = 0
+        candidates[4].votes = 0
         // Mostrar si alguien voto
         io.emit('update',candidates)
     })
