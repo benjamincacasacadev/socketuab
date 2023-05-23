@@ -10,7 +10,7 @@ const server = app.listen(port, () => {
     console.log("Escuchando 3000")
 })
 
-// Inicializar votos
+// Inicializar productos
 const candidates = {
     "0":{votes: 0, label: 'UPS', color: randomRGB() },
     "1":{votes: 0, label: 'Aires de precisión', color: randomRGB() },
@@ -24,7 +24,7 @@ function randomRGB() {
     return `rgb(${r()}, ${r()}, ${r()})`;
 }
 
-// socket.io server inside express
+// socket.io con express
 const io = require('socket.io')(server)
 io.on('connection',(socket) => {
     console.log('Nuevo cliente conectado')
